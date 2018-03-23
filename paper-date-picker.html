@@ -87,6 +87,7 @@ styling:
         height: 428px;
         @apply --layout-vertical;
       }
+
       :host([narrow]) #heading {
         width: auto;
         height: 96px;
@@ -99,33 +100,39 @@ styling:
         width: 168px;
         padding: 16px;
         box-sizing: border-box;
-        color: var(--text-primary-color);
-        background: var(--default-primary-color);
+        color: var(--paper-date-picker-color, var(--text-primary-color));
+        background: var(--paper-date-picker-background-color, var(--default-primary-color));
 
         @apply --layout-vertical;
         @apply --paper-date-picker-heading;
       }
+
       #heading .date,
       #heading .year {
         cursor: pointer;
       }
+
       #heading .date {
         @apply --paper-font-display1;
         font-weight: bold;
         margin-top: 2px;
         @apply --paper-date-picker-heading-date;
       }
+
       #heading div.date {
         letter-spacing: 0.025em;
       }
+
       #heading .date span {
         white-space: nowrap;
       }
+
       #heading .year {
         @apply --paper-font-body2;
         font-size: var(--paper-date-picker-year-size, 16px);
         @apply --paper-date-picker-heading-date;
       }
+
       #heading:not(.pg-chooseYear) .year,
       #heading.pg-chooseYear .date {
         color: var(--light-primary-color);
@@ -135,37 +142,41 @@ styling:
       :host([isTouch]) paper-year-list::-webkit-scrollbar {
         width: 0 !important;
       }
+
       #pages {
         @apply --layout-flex;
         width: auto;
         background: var(--default-background-color);
       }
+
       #calendar {
         --paper-calendar: {
           @apply --paper-date-picker-calendar;
         }
       }
     </style>
-    <iron-media-query query="{{_getMediaQuery(forceNarrow, responsiveWidth)}}" query-matches="{{_queryMatches}}"></iron-media-query>
+    <iron-media-query query="{{_getMediaQuery(forceNarrow, responsiveWidth)}}"
+                      query-matches="{{_queryMatches}}"></iron-media-query>
     <div id="datePicker">
       <div id="heading" class$="{{_getHeadingClass('heading-content', _selectedPage)}}">
         <div class="year" on-tap="_tapHeadingYear">{{dateFormat(date, 'YYYY', locale)}}</div>
         <div class="date" on-tap="_tapHeadingDate">
           <template is="dom-repeat" items="{{_splitHeadingDate(date, headingFormat, locale)}}">
-            <span>{{item}}</span>
+            <div>{{item}}</div>
           </template>
         </div>
       </div>
       <neon-animated-pages id="pages" selected="{{_selectedPage}}" attr-for-selected="id"
-        entry-animation="fade-in-animation" exit-animation="fade-out-animation"
-        on-iron-select="_pageSelected">
+                           entry-animation="fade-in-animation" exit-animation="fade-out-animation"
+                           on-iron-select="_pageSelected">
         <neon-animatable id="chooseDate">
           <paper-calendar id="calendar" locale="{{locale}}" date="{{date}}"
-            min-date="{{minDate}}" max-date="{{maxDate}}">
+                          min-date="{{minDate}}" max-date="{{maxDate}}">
           </paper-calendar>
         </neon-animatable>
         <neon-animatable id="chooseYear">
-          <paper-year-list id="yearList" date="{{date}}" on-tap="_tapHeadingDate" min="[[_minYear]]" max="[[_maxYear]]"></paper-year-list>
+          <paper-year-list id="yearList" date="{{date}}" on-tap="_tapHeadingDate" min="[[_minYear]]"
+                           max="[[_maxYear]]"></paper-year-list>
         </neon-animatable>
       </neon-animated-pages>
     </div>
@@ -261,15 +272,15 @@ styling:
       listeners: {
         'iron-resize': '_resizeHandler'
       },
-      ready: function() {
+      ready: function () {
         this.today = this.$.calendar.today;
         this._setIsTouch('ontouchstart' in window);
         this._selectPage('chooseDate');
       },
-      dateFormat: function() {
+      dateFormat: function () {
         return this.$.calendar.dateFormat.apply(this.$.calendar, arguments);
       },
-      _tapHeadingDate: function() {
+      _tapHeadingDate: function () {
         if (this.$.pages.selected !== 'chooseDate') {
           this._selectPage('chooseDate');
         } else {
@@ -279,25 +290,29 @@ styling:
           this.$.calendar.currentYear = this.date.getFullYear();
         }
       },
-      _tapHeadingYear: function() {
+      _tapHeadingYear: function () {
         if (this.$.pages.selected !== 'chooseYear') {
           this._selectPage('chooseYear');
           this.$.yearList.centerSelected();
         }
       },
-      _selectPage: function(page) {
+      _selectPage: function (page) {
         this.$.pages.selected = page;
       },
-      _getMediaQuery: function(forceNarrow, responsiveWidth) {
-        return '(max-width: ' + (forceNarrow ? '' : responsiveWidth) + ')';
+      _getMediaQuery: function (forceNarrow, responsiveWidth) {
+        return '(max-width: ' + (forceNarrow
+          ? ''
+          : responsiveWidth) + ')';
       },
-      _getHeadingClass: function(pfx, selectedPage) {
+      _getHeadingClass: function (pfx, selectedPage) {
         return pfx + ' pg-' + selectedPage;
       },
-      _getFullYear: function(date) {
-        return date ? new Date(date).getFullYear() : null;
+      _getFullYear: function (date) {
+        return date
+          ? new Date(date).getFullYear()
+          : null;
       },
-      _splitHeadingDate: function(date, format, locale) {
+      _splitHeadingDate: function (date, format, locale) {
         var re = new RegExp(this.headingBreak, 'g');
         var text = this.dateFormat(date, format, locale);
         var seps = text.match(re);
@@ -305,19 +320,19 @@ styling:
         if (!seps) {
           value = [text];
         } else {
-          value = text.split(re).map(function(s, i) {
+          value = text.split(re).map(function (s, i) {
             return s + (seps[i] || '');
           });
         }
         return value;
       },
-      _computeNarrow: function(queryMatches, forceNarrow) {
+      _computeNarrow: function (queryMatches, forceNarrow) {
         return queryMatches || forceNarrow;
       },
-      _pageSelected: function() {
+      _pageSelected: function () {
         this._resizeHandler();
       },
-      _resizeHandler: function() {
+      _resizeHandler: function () {
         if (this._resizing) {
           return;
         }
